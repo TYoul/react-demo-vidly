@@ -8,7 +8,7 @@ export default class Pagination extends Component {
   }
 
   render() {
-    const {pageSize,pageCount,onPage,currentPage} = this.props;
+    const {pageCount,onPage,currentPage} = this.props;
     const pages = _.range(1, pageCount + 1); // [1,...,pageCount]
     return (
       <nav aria-label="Page navigation example">
