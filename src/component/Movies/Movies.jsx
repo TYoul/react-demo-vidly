@@ -1,4 +1,5 @@
 import React, {Component} from "react";
+import _ from 'loadsh'
 import {getMovies} from "../../services/fakeMovieService";
 import {getGenres} from "../../services/fakeGenreService";
 import {pagination} from "../../utils/pagination";
@@ -14,7 +15,8 @@ export default class Movies extends Component {
       genres:[],  //  list-group筛选数据
       pageSize:4, //  分页每页展示的数据
       currentPage:1, //  当前分页，默认为1
-      selectedGenre:{}
+      selectedGenre:{},
+      sortColumn:{}
     };
   }
 
@@ -23,14 +25,9 @@ export default class Movies extends Component {
   }
 
   render() {
-    let {movies, genres, pageSize, currentPage, selectedGenre} = this.state;
-    const filter = selectedGenre && selectedGenre._id
-      ? movies.filter(m=>m.genre._id === selectedGenre._id)
-      : movies;
-
-    const count = filter.length;
-    const pageCount = Math.ceil(count/pageSize); // 分页总数
-    movies = pagination(filter,pageSize,currentPage);
+    const { movies: allMovies,genres, currentPage, selectedGenre,sortColumn} = this.state;
+    const count = allMovies.length;
+    const {movies,pageCount} = this.getPageData();
 
     if(count===0)return <p>There are no movies in the database.</p>
     return (
@@ -46,8 +43,10 @@ export default class Movies extends Component {
           <p>Showing {count} movies in the database.</p>
           <MoviesTable
             movies={movies}
+            sortColumn={sortColumn}
             onDetele={movie=>this.handleDetele(movie)}
             onLiked={movie=>this.handleLiked(movie)}
+            onSort={sortColumn=>this.handleSort(sortColumn)}
           />
           <Pagination
             pageCount={pageCount}
@@ -77,5 +76,21 @@ export default class Movies extends Component {
 
   handleGenre(genre){
     this.setState({selectedGenre: genre,currentPage:1})
+  }
+
+  handleSort(sortColumn){
+    this.setState({sortColumn})
+  }
+
+  getPageData(){
+    let {movies, pageSize, currentPage, selectedGenre,sortColumn} = this.state;
+    const filter = selectedGenre && selectedGenre._id
+      ? movies.filter(m=>m.genre._id === selectedGenre._id)
+      : movies;
+    const sorted = _.orderBy(filter,[sortColumn.path],[sortColumn.order])
+    const count = sorted.length;
+    const pageCount = Math.ceil(count/pageSize); // 分页总数
+    movies = pagination(sorted,pageSize,currentPage);
+    return {filter,movies,pageCount}
   }
 }
