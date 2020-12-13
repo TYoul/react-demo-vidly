@@ -1,5 +1,5 @@
-import React, {Component} from "react";
-import _ from 'loadsh'
+import React, { Component } from "react";
+import _ from "loadsh";
 
 export default class TableBody extends Component {
   constructor(props) {
@@ -8,12 +8,12 @@ export default class TableBody extends Component {
   }
 
   render() {
-    const {columns,data} = this.props;
+    const { columns, data } = this.props;
     return (
       <tbody>
-        {data.map(item=>(
+        {data.map((item) => (
           <tr key={item._id}>
-            {columns.map(column=>(
+            {columns.map((column) => (
               <td key={item._id + (column.path || column.key)}>
                 {this.renderCell(item, column)}
               </td>
@@ -21,11 +21,11 @@ export default class TableBody extends Component {
           </tr>
         ))}
       </tbody>
-    )
+    );
   }
 
-  renderCell(item,column){
-    if(column.content) return column.content(item)
-    return _.get(item, column.path)
+  renderCell(item, column) {
+    if (column.content) return column.content(item);
+    return _.get(item, column.path);
   }
 }
